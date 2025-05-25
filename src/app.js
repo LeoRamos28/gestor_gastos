@@ -377,7 +377,19 @@ document.addEventListener('keydown', (e) => {
 });
 
 document.getElementById('btn-logout').addEventListener('click', () => {
-  localStorage.removeItem('usuarioLogueado'); // elimina sesión local
-  window.location.href = 'login.html';       // redirige a login
+  Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¡Cerrar sesión!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
+  }).then((result) => {
+      if (result.isConfirmed) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('usuarioLogueado');
+          window.location.href = '/';  
+      }
+  });
 });
 

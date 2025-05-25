@@ -2,7 +2,9 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const express = require('express');
 const bcrypt = require('bcrypt');
-const connection = require('../js/db');
+const db = require('../db');
+const connection = require('../db');
+
 const router = express.Router();
 
 //  verificar el token
@@ -72,8 +74,12 @@ router.post('/login', (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ msg: 'Faltan datos' });
 
+  console.log("Procesando login para:", email); // Agrega logs aquí
+
   connection.query('SELECT * FROM usuario WHERE email = ?', [email], async (err, results) => {
     if (err) return res.status(500).json({ msg: 'Error en base de datos' });
+
+    console.log("Resultados de consulta:", results);
 
     if (results.length === 0) return res.status(400).json({ msg: 'Usuario no encontrado' });
 
@@ -81,6 +87,7 @@ router.post('/login', (req, res) => {
     const match = await bcrypt.compare(password, usuario.password_hash);
     if (!match) return res.status(400).json({ msg: 'Contraseña incorrecta' });
 
+    console.log("Login exitoso para usuario:", usuario.email);
     delete usuario.password_hash;
 
     // Generacion del token
@@ -95,6 +102,8 @@ router.post('/login', (req, res) => {
   });
 });
 
+
+console.log(router.stack.map(layer => layer.route && layer.route.path));
 module.exports = {
   router,
   verificarToken

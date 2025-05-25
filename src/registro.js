@@ -23,7 +23,7 @@ form.addEventListener('submit', async e => {
         confirmButtonText: 'Continuar',
       });
 
-      window.location.href = 'index.html';
+      window.location.href = '/index.html';
     } else if (nuevo) {
       localStorage.setItem('usuarioLogueado', JSON.stringify(nuevo));
       await Swal.fire({
@@ -32,7 +32,7 @@ form.addEventListener('submit', async e => {
         icon: 'success',
         confirmButtonText: 'Continuar',
       });
-      window.location.href = 'index.html';
+      window.location.href = '/index.html';
     } else {
       await Swal.fire({
         icon: 'error',

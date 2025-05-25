@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../js/db');
+const db = require('../db');
 const { verificarToken } = require('./auth'); 
 
 router.use(verificarToken); 

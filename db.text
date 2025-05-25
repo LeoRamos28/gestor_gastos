@@ -6,7 +6,6 @@ CREATE TABLE Usuario (
   email          VARCHAR(50) NOT NULL UNIQUE,
   password_hash  VARCHAR(255) NOT NULL,
   creado_en      DATETIME DEFAULT CURRENT_TIMESTAMP,
-  gastos         DECIMAL(10,2)
 );
 
 CREATE TABLE Categoria (

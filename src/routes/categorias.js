@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../js/db');
+const db = require('../db');
 
 // Obtener categorías
 router.get('/', (req, res) => {

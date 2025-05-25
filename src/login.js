@@ -28,7 +28,7 @@ form.addEventListener('submit', async e => {
       text: 'Has iniciado sesión con éxito.',
       confirmButtonText: 'Continuar'
     }).then(() => {
-      window.location.href = 'index.html'; 
+      window.location.href = '/index.html';
     });
   }
 });

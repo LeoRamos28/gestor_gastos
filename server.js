@@ -2,11 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { router: authRoutes, verificarToken } = require('./routes/auth');
+const { router: authRoutes, verificarToken } = require('./src/routes/auth');
 
-const usuariosRoutes = require('./routes/usuarios');
-const gastosRoutes = require('./routes/gastos');
-const categoriasRoutes = require('./routes/categorias'); 
+const usuariosRoutes = require('./src/routes/usuarios');
+const gastosRoutes = require('./src/routes/gastos');
+const categoriasRoutes = require('./src/routes/categorias'); 
 
 const app = express();
 const port = 3000;
@@ -21,10 +21,13 @@ app.use('/api/gastos', verificarToken, gastosRoutes);
 app.use('/api/categorias', categoriasRoutes); 
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
+  res.sendFile(path.join(__dirname,'public', 'login.html'));
 });
 
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/src', express.static(path.join(__dirname, 'src')));
+
+
 
 
 app.listen(port, () => {
