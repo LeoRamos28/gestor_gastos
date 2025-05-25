@@ -1,11 +1,11 @@
 export class UsuarioControlador {
- async registrarse(nombre, email, password) {
+ async registrarse(nombre_usuario, email, password) {
   const res = await fetch('http://localhost:3000/api/auth/register', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ nombre, email, password })
+    body: JSON.stringify({ nombre_usuario, email, password })
   });
 
   if (!res.ok) {

@@ -7,8 +7,8 @@ form.addEventListener('submit', async e => {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
   const ctrl = new UsuarioControlador();
-
   const response = await ctrl.iniciarSesion(email, password);
+
   if (response.msg) {
     Swal.fire({
       icon: 'error',
@@ -16,14 +16,19 @@ form.addEventListener('submit', async e => {
       text: response.msg
     });
   } else {
-    localStorage.setItem('usuarioLogueado', JSON.stringify(response));
+    // guarda token separado
+    localStorage.setItem('token', response.token);
+
+    // guarda datos del usuario
+    localStorage.setItem('usuarioLogueado', JSON.stringify(response.usuario));
+
     Swal.fire({
       icon: 'success',
-      title: `¡Bienvenido, ${response.nombre}!`,
+      title: `¡Bienvenido, ${response.usuario.nombre_usuario}!`,
       text: 'Has iniciado sesión con éxito.',
       confirmButtonText: 'Continuar'
     }).then(() => {
-      window.location.href = 'index.html';  // o a la página principal después del login
+      window.location.href = 'index.html'; 
     });
   }
 });

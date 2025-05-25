@@ -1,7 +1,6 @@
 const API_URL = 'http://localhost:3000/api/gastos';
 
 const usuarioLogueado = JSON.parse(localStorage.getItem('usuarioLogueado'));
-
 const formulario = document.querySelector('#agregar-gasto');
 const gastoListado = document.querySelector('#gastos ul');
 const btnFilter = document.getElementById('btn-filter');
@@ -15,7 +14,7 @@ eventListeners();
 function eventListeners() {
     document.addEventListener('DOMContentLoaded', () => {
         preguntarPresupuesto();
-        // cargarGastosDesdeBackend();
+        cargarCategorias();
     });
     formulario.addEventListener('submit', agregarGasto);
     btnFilter.addEventListener('click', filtrarGastos);
@@ -31,7 +30,6 @@ class Presupuesto {
     calcularRestante() {
         const gastado = this.gastos.reduce((total, gasto) => total + gasto.cantidad, 0);
         this.restante = this.presupuesto - gastado;
-        // console.log(`Gastado: ${gastado}, Restante: ${this.restante}`);
 
     }
 }
@@ -141,25 +139,65 @@ function preguntarPresupuesto() {
         btnEditPresupuesto.style.display = 'none';
     });
 }
+
+
+async function cargarCategorias() {
+    try {
+        const res = await fetch('http://localhost:3000/api/categorias');
+        const categorias = await res.json();
+
+        const select = document.querySelector('#categoria');
+        select.innerHTML = '<option value="">Seleccione</option>'; // Limpiar
+
+        categorias.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.nombre_categoria;
+            option.textContent = cat.nombre_categoria;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error cargando categorías:', error);
+        ui.imprimirAlerta('No se pudieron cargar las categorías', 'error');
+    }
+}
 async function cargarGastosDesdeBackend() {
     try {
-        const res = await fetch(API_URL);
+        const token = localStorage.getItem('token'); 
+
+        const res = await fetch(API_URL, {
+            headers: {
+                'Authorization': 'Bearer ' + token, // envia el token
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.msg || 'Error al cargar gastos');
+        }
+
         const gastos = await res.json();
 
+        if (!Array.isArray(gastos)) {
+            throw new Error('La respuesta no es una lista de gastos');
+        }
+
         gastos.forEach(gasto => {
-            gasto.cantidad = Number(gasto.cantidad); 
+            gasto.cantidad = Number(gasto.cantidad);
         });
-        
+
         presupuesto.gastos = gastos;
         presupuesto.calcularRestante();
         ui.agregarGastoListado(gastos);
         ui.actualizarRestante(presupuesto.restante);
         ui.comprobarPresupuesto(presupuesto);
+
     } catch (error) {
         console.error('Error cargando gastos:', error);
-        ui.imprimirAlerta('Error al cargar gastos', 'error');
+        ui.imprimirAlerta('Error al cargar gastos: ' + error.message, 'error');
     }
 }
+
 async function agregarGasto(e) {
     e.preventDefault();
 
@@ -175,23 +213,35 @@ async function agregarGasto(e) {
         return;
     }
 
-    const gasto = { nombre, cantidad, categoria };
+    const gasto = { nombre, cantidad, categoria,  id_usuario: usuarioLogueado.id_usuario,};
 
     try {
+        
+        const token = localStorage.getItem('token'); // Obtener token 
+
         if (editMode) {
             gasto.id = editGastoId;
             await fetch(`${API_URL}/${editGastoId}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(gasto)
             });
+
             ui.imprimirAlerta('Gasto editado con éxito', 'success');
         } else {
+            const token = localStorage.getItem('token');
             await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(gasto)
             });
+
             ui.imprimirAlerta('Gasto agregado con éxito', 'success');
         }
 
@@ -230,9 +280,16 @@ function editarGasto(gasto) {
 
 async function eliminarGasto(id) {
     try {
+
+        const token = localStorage.getItem('token'); // Obtener token 
+
         await fetch(`${API_URL}/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+            'Authorization': `Bearer ${token}`
+            }
         });
+
         await cargarGastosDesdeBackend();
         ui.imprimirAlerta('Gasto eliminado', 'success');
     } catch (error) {
@@ -244,8 +301,20 @@ async function eliminarGasto(id) {
 async function filtrarGastos() {
     const categoriaFiltrada = document.getElementById('filter-category').value.toLowerCase();
     try {
-        const res = await fetch(API_URL);
+                
+        const token = localStorage.getItem('token');
+        const res = await fetch(API_URL, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+        });
+
+         if (!res.ok) {
+            throw new Error('Error al obtener gastos');
+        }
+
         const gastos = await res.json();
+
         const filtrados = categoriaFiltrada
             ? gastos.filter(gasto => gasto.categoria.toLowerCase() === categoriaFiltrada)
             : gastos;
@@ -312,30 +381,3 @@ document.getElementById('btn-logout').addEventListener('click', () => {
   window.location.href = 'login.html';       // redirige a login
 });
 
-
-// const mensajeDiv = document.getElementById('mensaje-bienvenida');
-
-// if (response.msg) {
-//   alert(response.msg);
-// } else {
-//   localStorage.setItem('usuarioLogueado', JSON.stringify(response));
-//   mensajeDiv.textContent = `¡Bienvenido, ${response.nombre}! Has iniciado sesión con éxito.`;
-
-//   setTimeout(() => {
-//     window.location.href = 'index.html';
-//   }, 2000);  // Espera 2 segundos para que vean el mensaje
-// }
-
-
-// const mensajeDiv = document.getElementById('mensaje-registro');
-
-// if (nuevo) {
-//   localStorage.setItem('usuarioLogueado', JSON.stringify(nuevo));
-//   mensajeDiv.textContent = `¡Bienvenido, ${nuevo.nombre}! Te has registrado con éxito.`;
-
-//   setTimeout(() => {
-//     window.location.href = 'index.html';
-//   }, 2000);
-// } else {
-//   alert('Ese correo ya está en uso');
-// }
