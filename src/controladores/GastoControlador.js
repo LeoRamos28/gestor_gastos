@@ -10,7 +10,7 @@ let presupuesto;
 let editMode = false;
 let editGastoId = null;
 
-export function initApp() {
+export function iniciarApp() {
     document.addEventListener('DOMContentLoaded', () => {
         configurarPresupuesto();
         document.querySelector('#agregar-gasto').addEventListener('submit', agregarGasto);

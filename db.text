@@ -22,3 +22,8 @@ CREATE TABLE Gasto (
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
   FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria)
 );
+
+// para configurar comando
+git config --global alias.quick '!git add . && git commit -m'
+git quick "Tu mensaje de commit aquí" && git push origin main
+

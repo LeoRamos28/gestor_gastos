@@ -1,3 +1,5 @@
-import { initApp } from './controladores/GastoControlador.js';
+import { iniciarApp } from './controladores/GastoControlador.js'; 
 
-initApp();
+iniciarApp();
+
+// iniciar aplicacion, importa las funciones de GastoControlador

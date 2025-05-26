@@ -58,7 +58,7 @@ export class UI {
 
     comprobarPresupuesto({ presupuesto, restante }) {
         const restanteDiv = document.querySelector('.restante');
-        restanteDiv.className = 'restante alert'; // reset
+        restanteDiv.className = 'restante alert'; 
 
         if (restante <= presupuesto / 4) {
             restanteDiv.classList.add('alert-danger');
