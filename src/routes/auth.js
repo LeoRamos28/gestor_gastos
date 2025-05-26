@@ -74,7 +74,7 @@ router.post('/login', (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ msg: 'Faltan datos' });
 
-  console.log("Procesando login para:", email); // Agrega logs aquí
+  // console.log("Procesando login para:", email); 
 
   connection.query('SELECT * FROM usuario WHERE email = ?', [email], async (err, results) => {
     if (err) return res.status(500).json({ msg: 'Error en base de datos' });
@@ -103,7 +103,7 @@ router.post('/login', (req, res) => {
 });
 
 
-console.log(router.stack.map(layer => layer.route && layer.route.path));
+// console.log(router.stack.map(layer => layer.route && layer.route.path));
 module.exports = {
   router,
   verificarToken

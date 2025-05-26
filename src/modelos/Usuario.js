@@ -2,7 +2,6 @@ export class Usuario{
     constructor(id,nombre_usuario, email, password){
         this.id = id;
         this.nombre = nombre_usuario;
-        // this.apellido = apellido;
         this.email = email;
         this.password = password;
     }
