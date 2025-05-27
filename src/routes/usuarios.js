@@ -6,9 +6,17 @@ const { verificarToken } = require('./auth');
 
 
 // verificar usuario registrado
-router.get('/perfil', (req, res) => {
+
+router.get('/perfil', verificarToken, (req, res) => {
+  if (!req.usuario) {
+    return res.status(401).json({ 
+      msg: 'Acceso denegado.', 
+      usuario: req.usuario 
+    });
+  }
+
   res.json({
-    msg: 'Este es tu perfil',
+    msg: `Bienvenido, ${req.usuario.nombre_usuario} tus datos son los siguientes.`,
     usuario: req.usuario
   });
 });
