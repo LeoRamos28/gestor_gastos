@@ -3,19 +3,24 @@ import { UI } from '../vistas/ui.js';
 
 const API_URL = 'http://localhost:3000/api/gastos';
 const token = localStorage.getItem('token');
-const usuarioLogueado = JSON.parse(localStorage.getItem('usuarioLogueado'));
+const usuarioLogueado = JSON.parse(sessionStorage.getItem('usuarioLogueado'));
 const ui = new UI();
 
 let presupuesto;
 let editMode = false;
 let editGastoId = null;
+let filtroActivo = ''; //filtro global para mantener filtro aplicado
 
 export function iniciarApp() {
     document.addEventListener('DOMContentLoaded', () => {
         configurarPresupuesto();
+        //   resetPresupuesto();
+
         document.querySelector('#agregar-gasto').addEventListener('submit', agregarGasto);
         document.getElementById('btn-filter').addEventListener('click', filtrarGastos);
         document.getElementById('btn-logout').addEventListener('click', logout);
+        // document.getElementById('btn-reset-presupuesto').addEventListener('click', resetPresupuesto); 
+
 
         document.getElementById('btn-add-expense').addEventListener('click', () => {
             document.getElementById('form-overlay').classList.add('active');
@@ -43,6 +48,7 @@ function configurarPresupuesto() {
         cargarGastosDesdeBackend();
         btnSet.style.display = 'none';
         btnEdit.style.display = 'inline';
+        input.disabled = true; // bloqueo input al fijar presupuesto
     });
 
     btnEdit.addEventListener('click', () => {
@@ -54,45 +60,45 @@ function configurarPresupuesto() {
 }
 
 
-async function cargarGastosDesdeBackend() {
+export async function cargarGastosDesdeBackend() {
+    if (!presupuesto) {
+        console.error('Error: presupuesto no está definido. No se puede cargar gastos.');
+        ui.imprimirAlerta('Configura un presupuesto antes de cargar gastos.', 'error');
+        return;
+    }
+
     try {
         const res = await fetch(API_URL, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
         });
 
-        if (!res.ok) {
-            throw new Error('Error al cargar gastos');
-        }
+        if (!res.ok) throw new Error(await res.text());
 
         const gastos = await res.json();
-        gastos.forEach(g => g.cantidad = Number(g.cantidad));
-        presupuesto.gastos = gastos;
+        presupuesto.gastos = gastos.map(g => ({ ...g, monto: Number(g.monto) }));
         presupuesto.calcularRestante();
-        ui.agregarGastoListado(gastos, eliminarGasto, editarGasto);
-        ui.actualizarRestante(presupuesto.restante, presupuesto.presupuesto);
-        ui.comprobarPresupuesto(presupuesto);
+        ui.actualizarUI(presupuesto);
+        ui.agregarGastoListado(presupuesto.gastos, eliminarGasto, editarGasto);
+
     } catch (error) {
-        ui.imprimirAlerta('Error al cargar gastos', 'error');
         console.error('Error al cargar gastos:', error);
+        ui.imprimirAlerta('Error al cargar gastos', 'error');
     }
 }
 
-// Función para agregar 
+// Función para agregar o editar gasto
 async function agregarGasto(e) {
     e.preventDefault();
     const nombre = document.querySelector('#gasto').value;
-    const cantidad = Number(document.querySelector('#cantidad').value);
+    const monto = Number(document.querySelector('#monto').value);
     const categoria = document.querySelector('#categoria').value;
 
-    if (!nombre || !cantidad || !categoria || isNaN(cantidad) || cantidad <= 0) {
+    if (!nombre || !monto || !categoria || isNaN(monto) || monto <= 0) {
         ui.imprimirAlerta('Todos los campos son obligatorios', 'error');
         return;
     }
 
-    const gasto = { nombre, cantidad, categoria, id_usuario: usuarioLogueado.id_usuario };
+    const gasto = { nombre, monto, categoria, id_usuario: usuarioLogueado.id_usuario };
     const url = editMode ? `${API_URL}/${editGastoId}` : API_URL;
     const method = editMode ? 'PUT' : 'POST';
 
@@ -108,22 +114,20 @@ async function agregarGasto(e) {
 
         if (!res.ok) {
             const errorDetails = await res.json();
-            // console.error('Error al guardar gasto:', errorDetails);
             ui.imprimirAlerta(errorDetails.msg || 'Error al guardar el gasto', 'error');
             return;
         }
 
         ui.imprimirAlerta(editMode ? 'Gasto editado' : 'Gasto agregado', 'success');
-        
         reset();
-        cargarGastosDesdeBackend();
+        await recargarGastos();
+
     } catch (error) {
-        // console.error('Error de red o del servidor:', error);
         ui.imprimirAlerta('Error al guardar gasto', 'error');
     }
 }
 
-// Función para resetear el formulario y los estados
+// resetear el formulario y los estados
 function reset() {
     editMode = false;
     editGastoId = null;
@@ -131,19 +135,25 @@ function reset() {
     document.getElementById('form-overlay').classList.remove('active');
 }
 
-// Función para editar 
+// editar gasto: precarga el formulario y habilita modo edición
 function editarGasto(gasto) {
     document.querySelector('#gasto').value = gasto.nombre;
-    document.querySelector('#cantidad').value = gasto.cantidad;
-    document.querySelector('#categoria').value = gasto.categoria;
+    document.querySelector('#monto').value = gasto.monto;
+
+    const categoriaInput = document.querySelector('#categoria');
+    if (typeof gasto.categoria === 'object' && gasto.categoria !== null) {
+        categoriaInput.value = gasto.categoria.nombre_categoria;
+    } else {
+        categoriaInput.value = gasto.categoria;
+    }
 
     editMode = true;
-    editGastoId = gasto.id;
+    editGastoId = gasto.id_gasto;
     document.querySelector('#agregar-gasto button[type="submit"]').textContent = 'Guardar Cambios';
     document.getElementById('form-overlay').classList.add('active');
 }
 
-// Función para eliminar un gasto
+// eliminar gasto
 async function eliminarGasto(id) {
     try {
         const res = await fetch(`${API_URL}/${id}`, {
@@ -158,28 +168,50 @@ async function eliminarGasto(id) {
         }
 
         ui.imprimirAlerta('Gasto eliminado', 'success');
-        cargarGastosDesdeBackend(); // Recargar la lista despues de eliminar el gasto
+        await recargarGastos();
+
     } catch (error) {
         ui.imprimirAlerta('Error al eliminar gasto', 'error');
         console.error(error);
     }
 }
+
+// filtrar gastos y mostrar en UI
 async function filtrarGastos() {
-    const categoria = document.getElementById('filter-category').value.toLowerCase();
+    filtroActivo = document.getElementById('filter-category').value.toLowerCase();
+
     try {
         const res = await fetch(API_URL, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
+        if (!res.ok) throw new Error(await res.text());
+
         const gastos = await res.json();
-        const filtrados = categoria ? gastos.filter(g => g.categoria.toLowerCase() === categoria) : gastos;
+
+        const filtrados = filtroActivo
+            ? gastos.filter(g =>
+                g.categoria?.nombre_categoria?.toLowerCase() === filtroActivo
+            )
+            : gastos;
+
         ui.agregarGastoListado(filtrados, eliminarGasto, editarGasto);
 
         if (!filtrados.length) {
             ui.imprimirAlerta('No se encontraron gastos con esa categoría', 'error');
         }
-    } catch {
+    } catch (error) {
+        console.error('Error al filtrar gastos:', error);
         ui.imprimirAlerta('Error al filtrar gastos', 'error');
+    }
+}
+
+// recargar gastos segun filtro activo o sin filtro
+async function recargarGastos() {
+    if (filtroActivo) {
+        await filtrarGastos();
+    } else {
+        await cargarGastosDesdeBackend();
     }
 }
 
@@ -199,3 +231,37 @@ function logout() {
         }
     });
 }
+
+
+
+// function resetPresupuesto() {
+//     // Reiniciar el objeto presupuesto
+//     presupuesto = null;
+
+//     // Limpiar UI: presupuesto y restante a 0
+//     ui.insertarPresupuesto({ presupuesto: 0, restante: 0 });
+
+//     // Limpiar lista de gastos en UI
+//     const gastoListado = document.querySelector('#gastos ul');
+//     ui.limpiarHtml(gastoListado);
+
+//     // Habilitar input presupuesto para nuevo ingreso
+//     const input = document.getElementById('input-presupuesto');
+//     input.disabled = false;
+//     input.value = '';
+
+//     // Mostrar botón para setear presupuesto, ocultar editar
+//     document.getElementById('btn-set-presupuesto').style.display = 'inline';
+//     document.getElementById('btn-edit-presupuesto').style.display = 'none';
+
+//     // Otras limpiezas: deshabilitar botón submit gastos si aplica
+//     document.querySelector('#agregar-gasto button[type="submit"]').disabled = true;
+
+//     // Opcional: limpiar gastos guardados o variables de estado
+//     // Por ejemplo, si tienes editMode, editGastoId, etc.
+//     editMode = false;
+//     editGastoId = null;
+
+//     // Mostrar mensaje o alerta (opcional)
+//     ui.imprimirAlerta('Presupuesto reiniciado. Ingresa un nuevo presupuesto.', 'success');
+// }

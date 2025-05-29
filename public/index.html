@@ -19,14 +19,6 @@
     </h1>
     </header>
     <section class="contenido-principal">
-      <div>
-            <!-- <button id="btn-logout" class="btn btn-danger btn-sm">Cerrar sesión</button> -->
-
-          <label for="input-presupuesto"></label>
-          <input type="number" id="input-presupuesto" placeholder="Presupuesto" />
-          <button id="btn-set-presupuesto" class="btn-info">Establecer Presupuesto</button>
-          <button id="btn-edit-presupuesto" class="btn-success" style="display: none;">Editar Presupuesto</button>
-      </div>
 
       <div class="row">
             <div id="form-overlay" aria-modal="true" role="dialog" aria-labelledby="form-title" tabindex="-1">
@@ -38,8 +30,8 @@
                     <input type="text" class="form-control" id="gasto" placeholder="Ej. Supermercado" required autocomplete="off" />
                   </div>
                   <div class="form-group">
-                    <label for="cantidad" class="font-weight-semibold text-secondary">Precio ($)</label>
-                    <input type="text" class="form-control" id="cantidad" placeholder="Ej. $250" required autocomplete="off" />
+                    <label for="monto" class="font-weight-semibold text-secondary">Precio ($)</label>
+                    <input type="text" class="form-control" id="monto" placeholder="Ej. $250" required autocomplete="off" />
                   </div>
                   <div class="form-group">
                     <label for="categoria" class="font-weight-semibold text-secondary">Categoría</label>
@@ -54,10 +46,15 @@
             </div>
         </div> 
         <div class="container">
-
-
         <div class="row">
   <div class="col-md-4 ms-3 p-3">
+    <div class="mb-2" style="display: flex; gap: 10px; ">
+        <label for="input-presupuesto"></label>
+        <input type="number" id="input-presupuesto" placeholder="Presupuesto" style="width: 50%;" />
+        <button id="btn-set-presupuesto" class="btn-info" style="width: 50%;">Establecer</button>
+        <button id="btn-edit-presupuesto" class="btn-success" style="display: none; width: 50%;">Editar</button>
+        <!-- <button id="btn-reset-presupuesto" class="btn-succes">Resetear Presupuesto</button> -->
+    </div>
     <div id="presupuesto" class="presupuesto">
       <div class="alert alert-primary">
         <p>Presupuesto: $ <span id="total"></span> </p>
@@ -124,8 +121,6 @@
     </div>
   </div>
 </div>
-
-
 
   <button id="btn-add-expense" aria-label="Añadir nuevo gasto">+</button>
   <script type="module" src="/src/app.js"></script>

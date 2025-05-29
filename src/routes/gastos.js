@@ -1,124 +1,114 @@
 const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+const { verificarToken } = require('./auth');
+
+const prisma = new PrismaClient();
 const router = express.Router();
-const db = require('../db');
-const { verificarToken } = require('./auth'); 
 
-router.use(verificarToken); 
+router.use(verificarToken);
 
-router.get('/', (req, res) => {
-  const userId = req.userId;
+router.get('/', async (req, res) => {
+  try {
+    const gastos = await prisma.gasto.findMany({
+      where: { id_usuario: req.userId },
+      select: {
+        id_gasto: true,
+        nombre: true,
+        monto: true,
+        fecha: true,
+        id_usuario: true,
+        categoria: { select: { nombre_categoria: true } } 
+      }
+    });
 
-  const query = `
-    SELECT 
-      Gasto.id_gasto AS id,
-      Gasto.nombre,
-      Gasto.monto AS cantidad,
-      Categoria.nombre_categoria AS categoria
-    FROM Gasto
-    INNER JOIN Categoria ON Gasto.id_categoria = Categoria.id_categoria
-    WHERE Gasto.id_usuario = ?
-  `;
-
-  db.query(query, [userId], (err, results) => {
-    if (err) {
-      console.error('Error al obtener gastos:', err);
-      return res.status(500).json({ msg: 'Error al obtener los gastos' });
-    }
-    res.json(results);
-  });
+    console.log("Gastos enviados al frontend:", JSON.stringify(gastos, null, 2));
+    res.json(gastos);
+  } catch (error) {
+    console.error('Error al obtener gastos:', error);
+    res.status(500).json({ msg: 'Error interno en el servidor' });
+  }
 });
+
 
 
 // Agregar gasto
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   if (!req.userId) {
     return res.status(401).json({ msg: "Usuario no autenticado" });
   }
-  const { nombre, cantidad, categoria } = req.body;
-  const userId = req.userId;
 
-  const queryCategoria = 'SELECT id_categoria FROM Categoria WHERE nombre_categoria = ?';
-  db.query(queryCategoria, [categoria], (err, rows) => {
-    if (err) {
-      console.error('Error al buscar categoría:', err);
-      return res.status(500).json({ msg: 'Error al buscar categoría' });
-    }
+  const { nombre, monto, categoria } = req.body;
 
-    if (rows.length === 0) {
+  try {
+    console.log("Solicitud recibida:", req.body); // Verificar los datos recibidos
+    const categoriaEncontrada = await prisma.categoria.findUnique({
+      where: { nombre_categoria: categoria }
+    });
+
+    if (!categoriaEncontrada) {
       return res.status(400).json({ msg: 'Categoría no encontrada' });
     }
 
-    const id_categoria = rows[0].id_categoria;
-
-    const insertQuery = `
-      INSERT INTO Gasto (nombre, monto, fecha, id_usuario, id_categoria)
-      VALUES (?, ?, NOW(), ?, ?)
-    `;
-    db.query(insertQuery, [nombre, cantidad, req.userId, id_categoria], (err, result) => {
-      if (err) {
-        console.error('Error al insertar gasto:', err);
-        return res.status(500).json({ msg: 'Error al guardar el gasto' });
-      }
-
-      res.status(201).json({
-        id: result.insertId,
+    const nuevoGasto = await prisma.gasto.create({
+      data: {
         nombre,
-        cantidad,
-        categoria
-      });
+        monto: monto,
+        fecha: new Date(),
+        id_usuario: req.userId,
+        id_categoria: categoriaEncontrada.id_categoria
+      }
     });
-  });
+        console.log("Gasto registrado:", nuevoGasto); // Verifica qué se está guardando
+
+    res.status(201).json(nuevoGasto);
+  } catch (error) {
+    console.error('Error al insertar gasto:', error);
+    res.status(500).json({ msg: 'Error al guardar el gasto' });
+  }
 });
 
 // Editar gasto 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { nombre, cantidad, categoria } = req.body;
+  const { nombre, monto, categoria } = req.body;
 
-  const queryCategoria = 'SELECT id_categoria FROM Categoria WHERE nombre_categoria = ?';
-  db.query(queryCategoria, [categoria], (err, rows) => {
-    if (err) {
-      console.error('Error al buscar categoría:', err);
-      return res.status(500).json({ msg: 'Error al buscar categoría' });
-    }
+  try {
+    const categoriaEncontrada = await prisma.categoria.findUnique({
+      where: { nombre_categoria: categoria }
+    });
 
-    if (rows.length === 0) {
+    if (!categoriaEncontrada) {
       return res.status(400).json({ msg: 'Categoría no encontrada' });
     }
 
-    const id_categoria = rows[0].id_categoria;
-
-    const updateQuery = `
-      UPDATE Gasto
-      SET nombre = ?, monto = ?, id_categoria = ?
-      WHERE id_gasto = ? AND id_usuario = ?
-    `;
-    db.query(updateQuery, [nombre, cantidad, id_categoria, id, req.userId], (err, result) => {
-      if (err) {
-        console.error('Error al editar gasto:', err);
-        return res.status(500).json({ msg: 'Error al actualizar el gasto' });
+    const gastoActualizado = await prisma.gasto.update({
+      where: { id_gasto: parseInt(id) },
+      data: {
+        nombre,
+        monto: monto,
+        id_categoria: categoriaEncontrada.id_categoria
       }
-
-      res.json({ id, nombre, cantidad, categoria });
     });
-  });
+
+    res.json(gastoActualizado);
+  } catch (error) {
+    console.error('Error al actualizar gasto:', error);
+    res.status(500).json({ msg: 'Error al actualizar el gasto' });
+  }
 });
 
 // Eliminar gasto
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
+router.delete('/:id', async (req, res) => {
+  try {
+    await prisma.gasto.delete({
+      where: { id_gasto: parseInt(req.params.id) }
+    });
 
-  const deleteQuery = `
-    DELETE FROM Gasto WHERE id_gasto = ? AND id_usuario = ?
-  `;
-  db.query(deleteQuery, [id, req.userId], (err, result) => {
-    if (err) {
-      console.error('Error al eliminar gasto:', err);
-      return res.status(500).json({ msg: 'Error al eliminar el gasto' });
-    }
-
-    res.json({ id });
-  });
+    res.json({ msg: 'Gasto eliminado' });
+  } catch (error) {
+    console.error('Error al eliminar gasto:', error);
+    res.status(500).json({ msg: 'Error al eliminar el gasto' });
+  }
 });
 
 module.exports = router;

@@ -1,11 +1,20 @@
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const express = require('express');
-const bcrypt = require('bcrypt');
-const db = require('../db');
-const connection = require('../db');
-
+const express = Require('express');
+const jwt = Require('jsonwebtoken');
+Require('dotenv').config();
+const bcrypt = Require('bcrypt');
+const { PrismaClient } = Require('@prisma/client');
+const prisma = new PrismaClient();
 const router = express.Router();
+
+
+
+// Generar JWT
+    const token = jwt.sign({
+      id_usuario: usuario.id_usuario,
+      nombre_usuario: usuario.nombre_usuario,
+      email: usuario.email
+    }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
 
 //  verificar el token
 function verificarToken(req, res, next) {
@@ -37,7 +46,7 @@ function verificarToken(req, res, next) {
     req.usuario = usuario;
     req.userId = usuario.id_usuario;
 
-    // Continua con la ruta siguiente
+    // Continuar con la ruta siguiente
     next();
   });
 }
@@ -45,61 +54,63 @@ function verificarToken(req, res, next) {
 // Ruta de registro
 router.post('/register', async (req, res) => {
   const { nombre_usuario, email, password } = req.body;
-  if (!nombre_usuario || !email || !password) return res.status(400).json({ msg: 'Faltan datos' });
 
-  connection.query('SELECT * FROM usuario WHERE email = ?', [email], async (err, results) => {
-    if (err) return res.status(500).json({ msg: 'Error en base de datos' });
+  if (!nombre_usuario || !email || !password) {
+    return res.status(400).json({ msg: 'Faltan datos' });
+  }
 
-    if (results.length > 0) {
+  try {
+    // Verificar si el email ya está en uso
+    const usuarioExistente = await prisma.usuario.findUnique({ where: { email } });
+
+    if (usuarioExistente) {
       return res.status(400).json({ msg: 'El email ya está en uso' });
     }
 
+    // Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
-    connection.query(
-      'INSERT INTO usuario (nombre_usuario, email, password_hash) VALUES (?, ?, ?)',
-      [nombre_usuario, email, hashedPassword],
-      (err, result) => {
-        if (err) {
-          console.error('Error al crear usuario:', err);
-          return res.status(500).json({ msg: 'Error al crear usuario' });
-        }
-        return res.json({ id: result.insertId, nombre_usuario, email });
-      }
-    );
-  });
+
+    // Crear usuario
+    const nuevoUsuario = await prisma.usuario.create({
+      data: { nombre_usuario, email, password_hash: hashedPassword }
+    });
+
+    res.json({ id: nuevoUsuario.id_usuario, nombre_usuario, email });
+  } catch (error) {
+    console.error('Error al registrar usuario:', error);
+    res.status(500).json({ msg: 'Error interno' });
+  }
 });
 
 // Ruta de login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ msg: 'Faltan datos' });
+      console.log("Intentando login para:", email);
 
-  // console.log("Procesando login para:", email); 
+  if (!email || !password) {
+    return res.status(400).json({ msg: 'Faltan datos' });
+  }
 
-  connection.query('SELECT * FROM usuario WHERE email = ?', [email], async (err, results) => {
-    if (err) return res.status(500).json({ msg: 'Error en base de datos' });
+  try {
+    const usuario = await prisma.usuario.findUnique({ where: { email } });
+        console.log("Usuario encontrado:", usuario);
+    if (!usuario) {
+      return res.status(400).json({ msg: 'Usuario no encontrado' });
+    }
 
-    console.log("Resultados de consulta:", results);
-
-    if (results.length === 0) return res.status(400).json({ msg: 'Usuario no encontrado' });
-
-    const usuario = results[0];
     const match = await bcrypt.compare(password, usuario.password_hash);
-    if (!match) return res.status(400).json({ msg: 'Contraseña incorrecta' });
+    if (!match) {
+      return res.status(400).json({ msg: 'Contraseña incorrecta' });
+    }
 
-    console.log("Login exitoso para usuario:", usuario.email);
+    // Responder sin la contraseña
     delete usuario.password_hash;
+    res.json({ usuario: { id_usuario: usuario.id_usuario, nombre_usuario: usuario.nombre_usuario }, token });
 
-    // Generacion del token
-    const token = jwt.sign({
-      id_usuario: usuario.id_usuario,
-      nombre_usuario: usuario.nombre_usuario,
-      email: usuario.email
-    }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // Responder con el token y los datos del usuario 
-    return res.json({ usuario: { id_usuario: usuario.id_usuario, nombre_usuario: usuario.nombre_usuario }, token });
-  });
+  } catch (error) {
+    console.error('Error en el login:', error);
+    res.status(500).json({ msg: 'Error interno' });
+  }
 });
 
 

@@ -1,7 +1,7 @@
 export class UI {
     insertarPresupuesto({ presupuesto, restante }) {
-        document.querySelector('#total').textContent = presupuesto;
-        document.querySelector('#restante').textContent = restante;
+        document.querySelector('#total').textContent = presupuesto ?? 0; // fallback a 0
+        document.querySelector('#restante').textContent = restante ?? 0;
     }
 
     imprimirAlerta(mensaje, tipo) {
@@ -14,20 +14,36 @@ export class UI {
         });
     }
 
+    actualizarUI(presupuesto) {
+        this.insertarPresupuesto(presupuesto);
+        this.actualizarRestante(presupuesto.restante, presupuesto.presupuesto);
+        this.comprobarPresupuesto(presupuesto);
+    }
+
     agregarGastoListado(gastos, eliminarGasto, editarGasto) {
         const gastoListado = document.querySelector('#gastos ul');
         this.limpiarHtml(gastoListado);
         gastos.forEach(gasto => {
-            const { cantidad, nombre, categoria, id } = gasto;
+            console.log("Gasto recibido en UI:", gasto);
+
+            const { monto, nombre, categoria, id_gasto } = gasto;
             const nuevoGasto = document.createElement('li');
             nuevoGasto.className = 'list-group-item d-flex justify-content-between align-items-center';
-            nuevoGasto.dataset.id = id;
-            nuevoGasto.innerHTML = `${nombre} <span class='badge badge-primary badge-pill'> $${cantidad} </span>  ${categoria}`;
+            nuevoGasto.dataset.id = id_gasto;
+
+            const categoriaTexto = categoria?.nombre_categoria || categoria || 'Sin categoría';
+
+            nuevoGasto.textContent = nombre + " ";
+            const badge = document.createElement('span');
+            badge.className = 'badge badge-primary badge-pill';
+            badge.textContent = `$${monto}`;
+            nuevoGasto.appendChild(badge);
+            nuevoGasto.append(` ${categoriaTexto}`);
 
             const btnBorrar = document.createElement('button');
             btnBorrar.classList.add('btn', 'btn-danger');
             btnBorrar.textContent = 'Borrar X';
-            btnBorrar.onclick = () => eliminarGasto(id);
+            btnBorrar.onclick = () => eliminarGasto(id_gasto);
             nuevoGasto.appendChild(btnBorrar);
 
             const btnEditar = document.createElement('button');
@@ -38,6 +54,7 @@ export class UI {
 
             gastoListado.appendChild(nuevoGasto);
         });
+
     }
 
     limpiarHtml(element) {
@@ -48,6 +65,8 @@ export class UI {
 
     actualizarRestante(restante, presupuesto) {
         document.querySelector('#restante').textContent = restante;
+        if (!presupuesto || presupuesto === 0) return; // evitar division por cero
+
         const porcentajeRestante = Math.max(0, Math.min(100, (restante / presupuesto) * 100)).toFixed(2);
         const circle = document.querySelector(".CircularProgressbar-path");
         const texto = document.querySelector(".CircularProgressbar-text");
@@ -58,7 +77,7 @@ export class UI {
 
     comprobarPresupuesto({ presupuesto, restante }) {
         const restanteDiv = document.querySelector('.restante');
-        restanteDiv.className = 'restante alert'; 
+        restanteDiv.className = 'restante alert';
 
         if (restante <= presupuesto / 4) {
             restanteDiv.classList.add('alert-danger');
@@ -71,6 +90,8 @@ export class UI {
         if (restante <= 0) {
             this.imprimirAlerta('El presupuesto se ha agotado', 'error');
             document.querySelector('#agregar-gasto button[type="submit"]').disabled = true;
+        } else {
+            document.querySelector('#agregar-gasto button[type="submit"]').disabled = false;
         }
     }
 }
