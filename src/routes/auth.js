@@ -1,10 +1,11 @@
-const express = Require('express');
-const jwt = Require('jsonwebtoken');
-Require('dotenv').config();
-const bcrypt = Require('bcrypt');
-const { PrismaClient } = Require('@prisma/client');
+const express = require('express');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const bcrypt = require('bcrypt');
+
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const router = express.Router();
+const router = express.router();
 
 
 
