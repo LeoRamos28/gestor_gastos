@@ -2,19 +2,12 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const router = express.router();
+const router = express.Router();
 
-
-
-// Generar JWT
-    const token = jwt.sign({
-      id_usuario: usuario.id_usuario,
-      nombre_usuario: usuario.nombre_usuario,
-      email: usuario.email
-    }, process.env.JWT_SECRET, { expiresIn: '1h' });
+// const db = require('../db');
+// const connection = require('../db');
 
 
 //  verificar el token
@@ -103,6 +96,13 @@ router.post('/login', async (req, res) => {
     if (!match) {
       return res.status(400).json({ msg: 'Contraseña incorrecta' });
     }
+
+    // Generar JWT
+    const token = jwt.sign({
+      id_usuario: usuario.id_usuario,
+      nombre_usuario: usuario.nombre_usuario,
+      email: usuario.email
+    }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // Responder sin la contraseña
     delete usuario.password_hash;

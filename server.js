@@ -9,10 +9,12 @@ const gastosRoutes = require('./src/routes/gastos');
 const categoriasRoutes = require('./src/routes/categorias'); 
 const perfilRoutes = require('./src/routes/usuarios'); // #NUEVO
 
+
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+
 
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/perfil', verificarToken, perfilRoutes);
@@ -27,6 +29,7 @@ app.get('/', (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/src', express.static(path.join(__dirname, 'src')));
+
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
