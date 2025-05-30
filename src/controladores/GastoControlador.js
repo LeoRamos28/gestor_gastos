@@ -12,16 +12,15 @@ let editGastoId = null;
 let filtroActivo = ''; 
 
 export function iniciarApp() {
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
         configurarPresupuesto();
-
-        if (presupuesto) {
-            await cargarGastosDesdeBackend();
-        }
+        //   resetPresupuesto();
 
         document.querySelector('#agregar-gasto').addEventListener('submit', agregarGasto);
         document.getElementById('btn-filter').addEventListener('click', filtrarGastos);
         document.getElementById('btn-logout').addEventListener('click', logout);
+        // document.getElementById('btn-reset-presupuesto').addEventListener('click', resetPresupuesto); 
+
 
         document.getElementById('btn-add-expense').addEventListener('click', () => {
             document.getElementById('form-overlay').classList.add('active');
@@ -33,21 +32,10 @@ export function iniciarApp() {
     });
 }
 
-
 function configurarPresupuesto() {
     const input = document.getElementById('input-presupuesto');
     const btnSet = document.getElementById('btn-set-presupuesto');
     const btnEdit = document.getElementById('btn-edit-presupuesto');
-
-    const presupuestoGuardado = sessionStorage.getItem('presupuesto');
-    if (presupuestoGuardado) {
-        presupuesto = new Presupuesto(Number(presupuestoGuardado));
-        ui.insertarPresupuesto(presupuesto);
-        cargarGastosDesdeBackend();
-        btnSet.style.display = 'none';
-        btnEdit.style.display = 'inline';
-        input.disabled = true;
-    }
 
     btnSet.addEventListener('click', () => {
         const cantidad = Number(input.value);
@@ -56,12 +44,11 @@ function configurarPresupuesto() {
             return;
         }
         presupuesto = new Presupuesto(cantidad);
-        sessionStorage.setItem('presupuesto', cantidad);
         ui.insertarPresupuesto(presupuesto);
         cargarGastosDesdeBackend();
         btnSet.style.display = 'none';
         btnEdit.style.display = 'inline';
-        input.disabled = true;
+        input.disabled = true; // bloqueo input al fijar presupuesto
     });
 
     btnEdit.addEventListener('click', () => {
