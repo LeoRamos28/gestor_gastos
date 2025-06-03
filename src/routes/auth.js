@@ -6,10 +6,6 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const router = express.Router();
 
-// const db = require('../db');
-// const connection = require('../db');
-
-
 //  verificar el token
 function verificarToken(req, res, next) {
   const authHeader = req.headers.authorization;

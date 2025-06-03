@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -7,127 +7,99 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway:100,400" rel="stylesheet"/>
   <link rel="stylesheet" href="css/custom.css"/>
   <title>Gasto Semanal</title>
-
+</head>
 <body>
-   <div style="text-align: right; padding: 10px;">
-    <button id="btn-logout" class="btn btn-danger btn-sm">CERRAR SESION</button>
+
+  <div style="text-align: right; padding: 10px;">
+    <button id="btn-logout" class="btn btn-danger btn-sm">CERRAR SESIÓN</button>
   </div>
+
   <div class="container">
     <header>
-    <h1 class="planificador">
-    Planificador de <span>Gastos</span>
-    </h1>
+      <h1 class="planificador">Planificador de <span>Gastos</span></h1>
     </header>
-    <section class="contenido-principal">
 
+    <section class="contenido-principal">
       <div class="row">
-            <div id="form-overlay" aria-modal="true" role="dialog" aria-labelledby="form-title" tabindex="-1">
-              <div id="form-container">
-                <h2 id="form-title">Añade tus gastos aquí</h2>
-                <form id="agregar-gasto" action="#" novalidate>
-                  <div class="form-group">
-                    <label for="gasto" class="font-weight-semibold text-secondary">Nombre del Gasto</label>
-                    <input type="text" class="form-control" id="gasto" placeholder="Ej. Supermercado" required autocomplete="off" />
-                  </div>
-                  <div class="form-group">
-                    <label for="monto" class="font-weight-semibold text-secondary">Precio ($)</label>
-                    <input type="text" class="form-control" id="monto" placeholder="Ej. $250" required autocomplete="off" />
-                  </div>
-                  <div class="form-group">
-                    <label for="categoria" class="font-weight-semibold text-secondary">Categoría</label>
-                    <input type="text" class="form-control" id="categoria" placeholder="Ej. Alimentos, Transporte, Otros" required autocomplete="off" />
-                  </div>
-                  <div id="form-btns">
-                    <button type="submit" id="btn-submit">Agregar</button>
-                    <button type="button" id="btn-cancel-form">Cancelar</button>
-                  </div>
-                </form>
+        <div id="form-overlay" aria-modal="true" role="dialog" aria-labelledby="form-title" tabindex="-1">
+          <div id="form-container">
+            <h2 id="form-title">Añade tus gastos aquí</h2>
+            <form id="agregar-gasto" action="#" novalidate>
+              <div class="form-group">
+                <label for="gasto" class="font-weight-semibold text-secondary">Nombre del Gasto</label>
+                <input type="text" class="form-control" id="gasto" placeholder="Ej. Supermercado" required autocomplete="off"/>
+              </div>
+              <div class="form-group">
+                <label for="monto" class="font-weight-semibold text-secondary">Precio ($)</label>
+                <input type="number" class="form-control" id="monto" placeholder="Ej. $250" required autocomplete="off"/>
+              </div>
+              <div class="form-group">
+                <label for="categoria" class="font-weight-semibold text-secondary">Categoría</label>
+                <select class="form-control" id="categoria" required style="height: 50px; font-size: 16px;">
+                <option value="" disabled selected>Selecciona una categoría</option>
+              </select>
+              </div>
+              <div id="form-btns">
+                <button type="submit" id="btn-submit">Agregar</button>
+                <button type="button" id="btn-cancel-form">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 ms-3 p-3">
+            <div class="mb-2" style="display: flex; gap: 10px;">
+              <label for="input-presupuesto"></label>
+              <input type="number" id="input-presupuesto" placeholder="Presupuesto" style="width: 50%;" />
+              <button id="btn-set-presupuesto" class="btn-info" style="width: 50%;">Establecer</button>
+              <button id="btn-edit-presupuesto" class="btn-success" style="display: none; width: 50%;">Editar</button>
+              <!-- <button id="btn-reset-presupuesto" class="btn-success">Resetear</button> -->
+            </div>
+            <div id="presupuesto" class="presupuesto">
+              <div class="alert alert-primary">
+                <p>Presupuesto: $ <span id="total"></span></p>
+              </div>
+              <div class="restante alert alert-success">
+                <p>Disponible: $ <span id="restante"></span></p>
+              </div>
+              <div class="progress-circle text-center mt-3">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <path d="M 50,50 m 0,-46 a 46,46 0 1 1 0,92 a 46,46 0 1 1 0,-92" stroke="#d1d5db" stroke-width="8" fill="none"></path>
+                  <path class="CircularProgressbar-path" d="M 50,50 m 0,-46 a 46,46 0 1 1 0,92 a 46,46 0 1 1 0,-92" stroke-width="8" fill-opacity="0" style="stroke: rgb(59, 130, 246); stroke-dasharray: 289.027px; stroke-dashoffset: 289.027px; transition: stroke-dashoffset 0.5s ease;"></path>
+                  <text class="CircularProgressbar-text" x="50" y="50" style="fill: rgb(59, 130, 246); text-anchor: middle; dominant-baseline: middle; font-size: 18px;">0%</text>
+                </svg>
               </div>
             </div>
-        </div> 
-        <div class="container">
-        <div class="row">
-  <div class="col-md-4 ms-3 p-3">
-    <div class="mb-2" style="display: flex; gap: 10px; ">
-        <label for="input-presupuesto"></label>
-        <input type="number" id="input-presupuesto" placeholder="Presupuesto" style="width: 50%;" />
-        <button id="btn-set-presupuesto" class="btn-info" style="width: 50%;">Establecer</button>
-        <button id="btn-edit-presupuesto" class="btn-success" style="display: none; width: 50%;">Editar</button>
-        <!-- <button id="btn-reset-presupuesto" class="btn-succes">Resetear Presupuesto</button> -->
-    </div>
-    <div id="presupuesto" class="presupuesto">
-      <div class="alert alert-primary">
-        <p>Presupuesto: $ <span id="total"></span> </p>
-      </div>
-      <div class="restante alert alert-success">
-        <p>Disponible: $ <span id="restante"></span></p>
-      </div>
-      <div class="progress-circle text-center mt-3">
-  <svg width="100" height="100" viewBox="0 0 100 100">
-    <!-- Trazo de fondo gris -->
-    <path 
-      d="
-        M 50,50
-        m 0,-46
-        a 46,46 0 1 1 0,92
-        a 46,46 0 1 1 0,-92
-      "
-      stroke="#d1d5db" 
-      stroke-width="8"
-      fill="none"
-    ></path>
+          </div>
 
-    <path 
-      class="CircularProgressbar-path" 
-      d="
-        M 50,50
-        m 0,-46
-        a 46,46 0 1 1 0,92
-        a 46,46 0 1 1 0,-92
-      " 
-      stroke-width="8" 
-      fill-opacity="0" 
-      style="stroke: rgb(59, 130, 246); stroke-dasharray: 289.027px; stroke-dashoffset: 289.027px; transition: stroke-dashoffset 0.5s ease;"
-    ></path>
+          <div class="col-md-8">
+            <div class="contenido-secundario">
+              <h2 class="text-center">Filtrar Gastos</h2>
+              <div class="form-group d-flex justify-content-center align-items-center">
+                  <select id="filter-category" class="form-control me-2" style="width: 200px;">
+                    <option value="">Todas las categorías</option>
+                  </select>
 
-    <text 
-      class="CircularProgressbar-text" 
-      x="50" 
-      y="50" 
-      style="fill: rgb(59, 130, 246); text-anchor: middle; dominant-baseline: middle; font-size: 18px;"
-    >
-      0%
-    </text>
-  </svg>
-</div>
-
-    </div>
-  </div>
-<!-- <div id="mensaje-bienvenida" style="color: green; font-weight: bold; margin-bottom: 10px;"></div>
-<div id="mensaje-registro" style="color: green; font-weight: bold; margin-bottom: 10px;"></div> -->
-
-  <div class="col-md-8">
-    <div class="contenido-secundario">
-        <h2 class="text-center">Filtrar Gastos</h2>
-        <div class="form-group d-flex justify-content-center align-items-center">
-            <input type="text" class="form-control me-2" id="filter-category" placeholder="Ingresar categoria" style="width: 200px;" />
-            <button type="button" id="btn-filter" class="btn btn-primary">Filtrar</button>
+                <button type="button" id="btn-filter" class="btn btn-primary">Filtrar</button>
+              </div>
+              <div id="gastos">
+                <ul class="list-group"></ul>
+                <div id="mensaje-alerta" class="mt-3"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        
-      <div id="gastos">
-        <ul class="list-group"></ul>
-        <div id="mensaje-alerta" class="mt-3"></div>
       </div>
-    </div>
+
+      <button id="btn-add-expense" aria-label="Añadir nuevo gasto">+</button>
+    </section>
   </div>
-</div>
 
-  <button id="btn-add-expense" aria-label="Añadir nuevo gasto">+</button>
   <script type="module" src="/src/app.js"></script>
-
-
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
+
 </body>
 </html>
-

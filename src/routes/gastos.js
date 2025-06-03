@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
   const { nombre, monto, categoria } = req.body;
 
   try {
-    console.log("Solicitud recibida:", req.body); // Verificar los datos recibidos
+    console.log("Solicitud recibida:", req.body); 
     const categoriaEncontrada = await prisma.categoria.findUnique({
       where: { nombre_categoria: categoria }
     });
@@ -68,8 +68,8 @@ router.post('/', async (req, res) => {
 });
 
 // Editar gasto 
-router.put('/:id', async (req, res) => {
-  const { id } = req.params;
+router.put('/:id_gasto', async (req, res) => {
+  const { id_gasto } = req.params;
   const { nombre, monto, categoria } = req.body;
 
   try {
@@ -82,7 +82,7 @@ router.put('/:id', async (req, res) => {
     }
 
     const gastoActualizado = await prisma.gasto.update({
-      where: { id_gasto: parseInt(id) },
+      where: { id_gasto: parseInt(id_gasto) },
       data: {
         nombre,
         monto: monto,
@@ -98,10 +98,10 @@ router.put('/:id', async (req, res) => {
 });
 
 // Eliminar gasto
-router.delete('/:id', async (req, res) => {
+router.delete('/:id_gasto', async (req, res) => {
   try {
     await prisma.gasto.delete({
-      where: { id_gasto: parseInt(req.params.id) }
+      where: { id_gasto: parseInt(req.params.id_gasto) }
     });
 
     res.json({ msg: 'Gasto eliminado' });

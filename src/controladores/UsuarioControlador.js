@@ -28,11 +28,11 @@ export class UsuarioControlador {
         body: JSON.stringify({ email, password })
       });
 
-        console.log("Respuesta del servidor:", response); // respuesta servidor
+        console.log("Respuesta del servidor:", response); 
           if (!response.ok) {
             const errorMessage = await response.json().catch(() => ({ msg: 'Error en el servidor' }));
             console.error('Error en login:', errorMessage);
-            return errorMessage; // mensaje con SweetAlert
+            return errorMessage; 
       }
 
       const data = await response.json();
