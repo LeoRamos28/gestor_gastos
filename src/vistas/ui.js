@@ -1,6 +1,6 @@
 export class UI {
     insertarPresupuesto({ presupuesto, restante }) {
-        document.querySelector('#total').textContent = presupuesto ?? 0; // fallback a 0
+        document.querySelector('#total').textContent = presupuesto ?? 0; 
         document.querySelector('#restante').textContent = restante ?? 0;
     }
 
@@ -21,41 +21,50 @@ export class UI {
     }
 
     agregarGastoListado(gastos, eliminarGasto, editarGasto) {
-        const gastoListado = document.querySelector('#gastos ul');
-        this.limpiarHtml(gastoListado);
-        gastos.forEach(gasto => {
-            console.log("Gasto recibido en UI:", gasto);
+    const gastoListado = document.querySelector('#gastos ul');
+    this.limpiarHtml(gastoListado); // Limpia la lista antes de agregar nuevos elementos
 
-            const { monto, nombre, categoria, id_gasto } = gasto;
-            const nuevoGasto = document.createElement('li');
-            nuevoGasto.className = 'list-group-item d-flex justify-content-between align-items-center';
-            nuevoGasto.dataset.id = id_gasto;
+    gastos.forEach(gasto => {
+        console.log("Gasto recibido en UI:", gasto);
 
-            const categoriaTexto = categoria?.nombre_categoria || categoria || 'Sin categoría';
+        const { monto, nombre, categoria, id_gasto } = gasto;
+        const nuevoGasto = document.createElement('li');
+        nuevoGasto.className = 'list-group-item d-flex justify-content-between align-items-center';
+        nuevoGasto.dataset.id = id_gasto;
 
-            nuevoGasto.textContent = nombre + " ";
-            const badge = document.createElement('span');
-            badge.className = 'badge badge-primary badge-pill';
-            badge.textContent = `$${monto}`;
-            nuevoGasto.appendChild(badge);
-            nuevoGasto.append(` ${categoriaTexto}`);
+        const categoriaTexto = categoria?.nombre_categoria || categoria || 'Sin categoría';
 
-            const btnBorrar = document.createElement('button');
-            btnBorrar.classList.add('btn', 'btn-danger');
-            btnBorrar.textContent = 'Borrar X';
-            btnBorrar.onclick = () => eliminarGasto(id_gasto);
-            nuevoGasto.appendChild(btnBorrar);
+        nuevoGasto.textContent = nombre + " ";
 
-            const btnEditar = document.createElement('button');
-            btnEditar.classList.add('btn', 'btn-info', 'ml-2');
-            btnEditar.textContent = 'Editar';
-            btnEditar.onclick = () => editarGasto(gasto);
-            nuevoGasto.appendChild(btnEditar);
+        const badge = document.createElement('span');
+        badge.className = 'nuevo-gasto';
+        badge.textContent = `$${monto}`;
+        nuevoGasto.appendChild(badge);
+        nuevoGasto.append(` ${categoriaTexto}`);
+        
 
-            gastoListado.appendChild(nuevoGasto);
-        });
+        // Contenedor de botones para evitar duplicados
+        const btnContainer = document.createElement('div');
+        btnContainer.classList.add('btn-container');
+        
+        // Botón borrar
+        const btnBorrar = document.createElement('button');
+        btnBorrar.classList.add('btn', 'btn-danger');
+        btnBorrar.textContent = 'Borrar';
+        btnBorrar.onclick = () => eliminarGasto(id_gasto);
+        btnContainer.appendChild(btnBorrar);
 
-    }
+        // Botón editar
+        const btnEditar = document.createElement('button');
+        btnEditar.classList.add('btn', 'btn-info', 'ml-2');
+        btnEditar.textContent = 'Editar';
+        btnEditar.onclick = () => editarGasto(gasto);
+        btnContainer.appendChild(btnEditar);
+
+        nuevoGasto.appendChild(btnContainer);
+        gastoListado.appendChild(nuevoGasto);
+    });
+}
 
     limpiarHtml(element) {
         while (element.firstChild) {

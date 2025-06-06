@@ -10,18 +10,20 @@ const ui = new UI();
 let presupuesto;
 let editMode = false;
 let editGastoId = null;
-let filtroActivo = ''; //
+let filtroActivo = ''; 
 
 export function iniciarApp() {
     document.addEventListener('DOMContentLoaded', async () => {
     configurarPresupuesto();
+    // resetPresupuesto();
+
     await cargarPresupuestoDesdeBackend(); // Cargar presupuesto al iniciar
     
     const categorias = ["Alimentos", "Educacion", "Entretenimiento", "Hogar", "Indumentaria", "Salud", "Vivienda", "Otros"];
     const selectCategoria = document.getElementById("categoria");
     const selectFiltro = document.getElementById("filter-category");
     
-    selectCategoria.innerHTML = '<option value="" disabled selected>Selecciona una categoría</option>'; // Asegura que la primera opción siempre está presente
+    selectCategoria.innerHTML = '<option value="" disabled selected>Selecciona una categoría</option>'; 
     selectFiltro.innerHTML = '<option value="">Todas las categorías</option>';  
      
     categorias.forEach(categoria => {
@@ -39,6 +41,9 @@ export function iniciarApp() {
     document.querySelector('#agregar-gasto').addEventListener('submit', agregarGasto);
     document.getElementById('btn-filter').addEventListener('click', filtrarGastos);
     document.getElementById('btn-logout').addEventListener('click', logout);
+    // document.getElementById('btn-reset-presupuesto').addEventListener('click', resetPresupuesto); 
+
+    
     document.getElementById('btn-add-expense').addEventListener('click', () => {
         document.getElementById('form-overlay').classList.add('active');
     });
@@ -62,7 +67,7 @@ async function cargarPresupuestoDesdeBackend() {
         const data = await res.json();
         presupuesto = new Presupuesto(data.presupuesto);
         ui.insertarPresupuesto(presupuesto);
-        await cargarGastosDesdeBackend(); // Cargar automáticamente los gastos
+        await cargarGastosDesdeBackend(); // Cargar automaticamente los gastos
 
         document.getElementById('btn-set-presupuesto').style.display = 'none';
         document.getElementById('btn-edit-presupuesto').style.display = 'inline';
@@ -300,41 +305,7 @@ function logout() {
         if (result.isConfirmed) {
             localStorage.removeItem('token');
             localStorage.removeItem('usuarioLogueado');
-            window.location.href = '/';
+                window.location.href = '/';
         }
     });
 }
-
-
-
-// function resetPresupuesto() {
-//     // Reiniciar el objeto presupuesto
-//     presupuesto = null;
-
-//     // Limpiar UI: presupuesto y restante a 0
-//     ui.insertarPresupuesto({ presupuesto: 0, restante: 0 });
-
-//     // Limpiar lista de gastos en UI
-//     const gastoListado = document.querySelector('#gastos ul');
-//     ui.limpiarHtml(gastoListado);
-
-//     // Habilitar input presupuesto para nuevo ingreso
-//     const input = document.getElementById('input-presupuesto');
-//     input.disabled = false;
-//     input.value = '';
-
-//     // Mostrar botón para setear presupuesto, ocultar editar
-//     document.getElementById('btn-set-presupuesto').style.display = 'inline';
-//     document.getElementById('btn-edit-presupuesto').style.display = 'none';
-
-//     // Otras limpiezas: deshabilitar botón submit gastos si aplica
-//     document.querySelector('#agregar-gasto button[type="submit"]').disabled = true;
-
-//     // Opcional: limpiar gastos guardados o variables de estado
-//     // Por ejemplo, si tienes editMode, editGastoId, etc.
-//     editMode = false;
-//     editGastoId = null;
-
-//     // Mostrar mensaje o alerta (opcional)
-//     ui.imprimirAlerta('Presupuesto reiniciado. Ingresa un nuevo presupuesto.', 'success');
-// }

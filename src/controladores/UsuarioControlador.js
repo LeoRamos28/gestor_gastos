@@ -20,6 +20,8 @@ export class UsuarioControlador {
     }
   }
 
+  
+
   async iniciarSesion(email, password) {
     try {
       const response = await fetch('http://localhost:3000/api/auth/login', {

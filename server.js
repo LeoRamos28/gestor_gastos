@@ -14,18 +14,37 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
-
 app.use('/api/presupuestos', presupuestoRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/perfil', verificarToken, perfilRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/gastos', verificarToken, gastosRoutes);
-// app.use('/api/categorias', verificarToken, categoriasRoutes);
-app.use('/api/categorias', categoriasRoutes); 
+app.use('/api/categorias', verificarToken, categoriasRoutes);
+// app.use('/api/categorias', categoriasRoutes); 
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname,'public', 'inicio.html'));
 });
+
+app.get('/api', (req, res) => {
+  const condicion = true;
+
+  if (condicion){
+    res.send({
+      success: true,
+      message : "API esta funcionando correctamente",
+
+    });
+  }else {
+    res.send({
+      success: false,
+      message : "API no esta funcionando"
+  });
+}
+});
+// app.get('/api', (req, res) => {
+// //   res.send('API está funcionando correctamente');
+// });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/src', express.static(path.join(__dirname, 'src')));
