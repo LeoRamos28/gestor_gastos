@@ -46,20 +46,20 @@ export class UI {
         // Contenedor de botones para evitar duplicados
         const btnContainer = document.createElement('div');
         btnContainer.classList.add('btn-container');
-        
-        // Botón borrar
-        const btnBorrar = document.createElement('button');
-        btnBorrar.classList.add('btn', 'btn-danger');
-        btnBorrar.textContent = 'Borrar';
-        btnBorrar.onclick = () => eliminarGasto(id_gasto);
-        btnContainer.appendChild(btnBorrar);
 
+        
         // Botón editar
         const btnEditar = document.createElement('button');
         btnEditar.classList.add('btn', 'btn-info', 'ml-2');
         btnEditar.textContent = 'Editar';
         btnEditar.onclick = () => editarGasto(gasto);
         btnContainer.appendChild(btnEditar);
+        // Botón borrar
+        const btnBorrar = document.createElement('button');
+        btnBorrar.classList.add('btn', 'btn-danger');
+        btnBorrar.textContent = 'Borrar';
+        btnBorrar.onclick = () => eliminarGasto(id_gasto);
+        btnContainer.appendChild(btnBorrar);
 
         nuevoGasto.appendChild(btnContainer);
         gastoListado.appendChild(nuevoGasto);
