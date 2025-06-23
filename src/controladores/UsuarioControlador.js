@@ -59,3 +59,13 @@ export class UsuarioControlador {
     sessionStorage.removeItem('token');
   }
 }
+
+/* 
+Concepto	Explicación
+fetch	API para hacer solicitudes HTTP asíncronas.
+sessionStorage	Almacena datos hasta que el navegador se cierre.
+Content-Type: application/json	Se indica que el cuerpo del request será JSON.
+async/await	Permite escribir código asíncrono de forma más legible.
+
+Esta clase UsuarioControlador encapsula la lógica de autenticación del frontend, separándola del resto del código para hacerla más modular y reutilizable. Permite registrar, iniciar sesión, obtener datos del usuario y cerrar sesión de forma clara y sencilla.
+*/

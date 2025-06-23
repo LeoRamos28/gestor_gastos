@@ -32,3 +32,16 @@ form.addEventListener('submit', async e => {
     });
   }
 });
+
+/* 
+Captura el submit del formulario.
+
+Obtiene email y password del formulario.
+
+Llama a UsuarioControlador.iniciarSesion(email, password) para autenticar.
+
+Muestra error con SweetAlert si la respuesta tiene msg.
+
+Si es exitoso, guarda token y usuario en localStorage.
+
+Muestra alerta de éxito y redirige a la página principal.*/

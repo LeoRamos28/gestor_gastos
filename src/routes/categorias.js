@@ -66,3 +66,12 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+
+/* 
+Método	Ruta	Función
+GET	/	Obtener todas las categorías
+POST	/	Crear una nueva categoría
+PUT	/:id	Editar una categoría por ID
+DELETE	/:id	Eliminar una categoría por ID
+*/

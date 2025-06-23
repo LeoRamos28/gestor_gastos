@@ -6,7 +6,6 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const router = express.Router();
 
-//  verificar el token
 function verificarToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -21,14 +20,7 @@ function verificarToken(req, res, next) {
       return res.status(403).json({ msg: 'Token inválido o expirado' });
     }
 
-    // Mostrar datos del usuario 
-    // console.log("Datos del usuario:", {
-    //   id_usuario: usuario.id_usuario,
-    //   nombre_usuario: usuario.nombre_usuario,
-    //   email: usuario.email
-    // });
-
-    // verifica que el token tiene un ID de usuario válido
+    // verificar que el token tiene un ID valido
     if (!usuario.id_usuario) {
       return res.status(403).json({ msg: 'Token sin ID de usuario válido' });
     }
@@ -36,7 +28,6 @@ function verificarToken(req, res, next) {
     req.usuario = usuario;
     req.userId = usuario.id_usuario;
 
-    // Continuar con la ruta siguiente
     next();
   });
 }
@@ -50,7 +41,7 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    // Verificar si el email ya está en uso
+    // Verificar si el email ya esta en uso
     const usuarioExistente = await prisma.usuario.findUnique({ where: { email } });
 
     if (usuarioExistente) {
@@ -110,9 +101,50 @@ router.post('/login', async (req, res) => {
   }
 });
 
-
-// console.log(router.stack.map(layer => layer.route && layer.route.path));
 module.exports = {
   router,
   verificarToken
 };
+
+
+
+/* 
+Verifica si el cliente incluyó un token en el header Authorization.
+
+Usa jwt.verify() para comprobar que el token es válido.
+
+Si es válido, adjunta los datos del usuario a la solicitud (req.usuario y req.userId) y deja pasar a la siguiente ruta.
+
+Recibe nombre, email y contraseña.
+
+Verifica que no haya un usuario con el mismo email.
+
+Encripta la contraseña con bcrypt.
+
+Crea un nuevo usuario en la base de datos con prisma.usuario.create.
+
+Devuelve los datos del nuevo usuario (sin contraseña).
+
+Recibe email y contraseña del usuario.
+
+Busca el usuario por email.
+
+Compara la contraseña con el hash guardado en base de datos.
+
+Si coincide:
+
+Genera un JWT con los datos del usuario.
+
+Devuelve el token y los datos del usuario (sin la contraseña).
+
+Este código define un módulo de autenticación en un servidor Node.js con Express usando:
+
+🧠 JWT (JSON Web Tokens) para manejo de sesiones.
+
+🔐 bcrypt para encriptar contraseñas.
+
+🧱 Prisma para interactuar con una base de datos.
+
+📦 dotenv para cargar variables sensibles como JWT_SECRET.
+
+*/

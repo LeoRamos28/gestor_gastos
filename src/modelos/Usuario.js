@@ -27,3 +27,27 @@ export class Usuario {
         return new Usuario(data.id_usuario, data.nombre_usuario, data.email, data.password_hash);
     }
 }
+
+/* 
+La clase Usuario:
+
+Representa un usuario del sistema (con id, nombre_usuario, email y contraseña).
+
+Permite:
+
+Buscar un usuario por ID (obtenerPorId).
+
+Crear un nuevo usuario (crearUsuario).
+
+Crear una instancia desde datos JSON (fromJSON).
+
+Usa Prisma para interactuar con la base de datos.
+
+Método	Propósito
+obtenerPorId(id)	Recupera un usuario desde la base de datos
+crearUsuario(...)	Inserta un nuevo usuario en la DB
+fromJSON(data)	Transforma datos JSON a una instancia Usuario
+constructor(...)	Crea una instancia de la clase Usuario
+
+
+*/

@@ -42,8 +42,7 @@ export function iniciarApp() {
     document.getElementById('btn-filter').addEventListener('click', filtrarGastos);
     document.getElementById('btn-logout').addEventListener('click', logout);
     // document.getElementById('btn-reset-presupuesto').addEventListener('click', resetPresupuesto); 
-
-    
+        
     document.getElementById('btn-add-expense').addEventListener('click', () => {
         document.getElementById('form-overlay').classList.add('active');
     });
@@ -234,7 +233,7 @@ function editarGasto(gasto) {
 // eliminar gasto
 async function eliminarGasto(id_gasto) {
     try {
-        const res = await fetch(`${API_URL}/gastos/${id_gasto}`, { // <-- Cambia la ruta
+        const res = await fetch(`${API_URL}/gastos/${id_gasto}`, { 
         // const res = await fetch(`${API_URL}/${id_gasto}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
@@ -309,3 +308,16 @@ function logout() {
         }
     });
 }
+
+/* 
+Este módulo gestiona la lógica principal de la aplicación de gastos personales: carga, inserción, edición, eliminación y visualización de datos, siempre sincronizados con el backend. También garantiza una buena experiencia de usuario al integrar alertas, validaciones y control visual mediante clases auxiliares.
+
+Función	Acción
+iniciarApp()	Inicia todo el sistema al cargar
+agregarGasto()	Agrega o edita un gasto
+eliminarGasto()	Elimina un gasto del backend
+editarGasto()	Llena el formulario para edición
+filtrarGastos()	Filtra gastos por categoría
+configurarPresupuesto()	Establece o edita el presupuesto
+logout()	Cierra la sesión del usuario
+*/

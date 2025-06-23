@@ -57,3 +57,20 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+
+/* 
+Método	Ruta	Funcionalidad
+GET	/:id_usuario	Obtener el presupuesto de un usuario
+POST	/	Crear o actualizar el presupuesto
+
+Este módulo:
+
+Gestiona presupuestos de usuarios.
+
+Asegura acceso solo a usuarios autenticados.
+
+Permite crear, consultar y actualizar presupuestos.
+
+Usa buenas prácticas con Prisma y Express.
+
+*/

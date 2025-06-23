@@ -22,7 +22,7 @@ export class UI {
 
     agregarGastoListado(gastos, eliminarGasto, editarGasto) {
     const gastoListado = document.querySelector('#gastos ul');
-    this.limpiarHtml(gastoListado); // Limpia la lista antes de agregar nuevos elementos
+    this.limpiarHtml(gastoListado); 
 
     gastos.forEach(gasto => {
         console.log("Gasto recibido en UI:", gasto);
@@ -35,26 +35,23 @@ export class UI {
         const categoriaTexto = categoria?.nombre_categoria || categoria || 'Sin categoría';
 
         nuevoGasto.textContent = nombre + " ";
-
         const badge = document.createElement('span');
         badge.className = 'nuevo-gasto';
         badge.textContent = `$${monto}`;
         nuevoGasto.appendChild(badge);
         nuevoGasto.append(` ${categoriaTexto}`);
-        
 
-        // Contenedor de botones para evitar duplicados
         const btnContainer = document.createElement('div');
         btnContainer.classList.add('btn-container');
 
         
-        // Botón editar
+        // Boton editar
         const btnEditar = document.createElement('button');
         btnEditar.classList.add('btn', 'btn-info', 'ml-2');
         btnEditar.textContent = 'Editar';
         btnEditar.onclick = () => editarGasto(gasto);
         btnContainer.appendChild(btnEditar);
-        // Botón borrar
+        // Boton borrar
         const btnBorrar = document.createElement('button');
         btnBorrar.classList.add('btn', 'btn-danger');
         btnBorrar.textContent = 'Borrar';
@@ -74,7 +71,7 @@ export class UI {
 
     actualizarRestante(restante, presupuesto) {
         document.querySelector('#restante').textContent = restante;
-        if (!presupuesto || presupuesto === 0) return; // evitar division por cero
+        if (!presupuesto || presupuesto === 0) return; 
 
         const porcentajeRestante = Math.max(0, Math.min(100, (restante / presupuesto) * 100)).toFixed(2);
         const circle = document.querySelector(".CircularProgressbar-path");
@@ -104,3 +101,26 @@ export class UI {
         }
     }
 }
+
+/* 
+La clase UI encapsula todas las interacciones visuales relacionadas con:
+
+Mostrar el presupuesto y el restante.
+
+Listar los gastos.
+
+Mostrar alertas.
+
+Dibujar el progreso visual del presupuesto.
+
+actualizarUI(presupuesto)
+Actualiza la interfaz general con:
+
+El presupuesto actualizado.
+
+El restante.
+
+El círculo de progreso.
+
+El color del alert.
+*/

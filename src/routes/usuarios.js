@@ -5,9 +5,6 @@ const { verificarToken } = require('./auth');
 const prisma = new PrismaClient();
 const router = express.Router();
 
-
-// verificar usuario registrado
-
 router.get('/perfil', verificarToken, async (req, res) => {
   try {
     const usuario = await prisma.usuario.findUnique({
@@ -101,3 +98,16 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+
+/* 
+Ruta	Método	Descripción
+/perfil	GET	Devuelve datos del usuario autenticado
+/	GET	Lista todos los usuarios
+/:id	GET	Obtiene usuario por ID
+/	POST	Crea usuario (requiere contraseña hasheada)
+/:id	PUT	Actualiza nombre/email del usuario
+/:id	DELETE	Elimina usuario
+*/

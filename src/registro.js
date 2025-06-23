@@ -49,3 +49,22 @@ form.addEventListener('submit', async e => {
     });
   }
 });
+
+
+
+
+
+/* 
+Captura los datos del formulario.
+
+Valida que estén completos.
+
+Llama a la función para registrar al usuario en el backend.
+
+Guarda el token y datos recibidos localmente.
+
+Muestra mensajes de éxito o error.
+
+Redirige al login cuando el registro termina.
+
+*/

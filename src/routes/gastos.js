@@ -58,7 +58,7 @@ router.post('/', async (req, res) => {
         id_categoria: categoriaEncontrada.id_categoria
       }
     });
-        console.log("Gasto registrado:", nuevoGasto); // Verifica qué se está guardando
+        console.log("Gasto registrado:", nuevoGasto);
 
     res.status(201).json(nuevoGasto);
   } catch (error) {
@@ -112,3 +112,12 @@ router.delete('/:id_gasto', async (req, res) => {
 });
 
 module.exports = router;
+
+
+/* 
+Método	Ruta	Función
+GET	/	Obtener todos los gastos del usuario
+POST	/	Crear un nuevo gasto
+PUT	/:id_gasto	Editar un gasto existente
+DELETE	/:id_gasto	Eliminar un gasto existente
+*/

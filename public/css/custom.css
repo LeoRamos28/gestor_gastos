@@ -175,13 +175,13 @@ h2 {
 }
 
 /* Botones principales */
-#form-btns button:first-child {
+/* #form-btns button:first-child {
     @extend .btn-gradient;
 }
 
 #form-btns button:last-child {
     @extend .btn-gradient-red;
-}
+} */
 
 /* Botón de logout */
 #btn-logout {
@@ -214,14 +214,14 @@ h2 {
     transition: transform 0.2s ease;
 }
 
-#btn-set-presupuesto {
+/* #btn-set-presupuesto {
     @extend .btn-gradient-blue;
 }
 
 #btn-edit-presupuesto {
     @extend .btn-gradient;
 }
-
+ */
 #btn-set-presupuesto:hover, #btn-edit-presupuesto:hover {
     transform: scale(1.04);
 }
